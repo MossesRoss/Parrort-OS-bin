@@ -1,0 +1,31 @@
+#!/bin/zsh
+
+# ---- Guardrails ----
+if [[ -z "$1" ]]; then
+  echo "Usage: jarvis <minutes>"
+  return 1
+fi
+
+if ! [[ "$1" =~ '^[0-9]+$' ]]; then
+  echo "Minutes must be a number."
+  return 1
+fi
+
+MINUTES=$1
+SECONDS=$(( MINUTES * 60 ))
+
+# ---- Detach & forget ----
+setsid sh -c "
+  sleep $SECONDS
+
+  if command -v paplay >/dev/null; then
+    paplay /usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga
+  elif command -v aplay >/dev/null; then
+    aplay /usr/share/sounds/alsa/Front_Center.wav
+  fi
+
+  notify-send -u critical -t 0 \
+    '⏱️ JARVIS TIMER COMPLETE' \
+    '$MINUTES minutes elapsed. Execute.'
+" >/dev/null 2>&1 & disown
+
