@@ -16,10 +16,10 @@ EXIT_CODE=$?
 
 if [ $EXIT_CODE -eq 0 ]; then
     # Success protocol (Queued normally)
-    jarvis_say "Execution of $COMMAND_NAME is complete Mr Mosas. Zero errors."
+    ~/.local/bin/~/.local/bin/jarvis_say "Execution of $COMMAND_NAME is complete Mr Mosas. Zero errors."
 else
     # Failure protocol (Priority override to alert user immediately)
-    jarvis_say --critical "Pardon the interruption Mr Mosas. The $COMMAND_NAME process encountered a fatal exception and exited with code $EXIT_CODE. Awaiting your triage."
+    ~/.local/bin/~/.local/bin/jarvis_say --critical "Pardon the interruption Mr Mosas. The $COMMAND_NAME process encountered a fatal exception and exited with code $EXIT_CODE. Awaiting your triage."
 fi
 
 exit $EXIT_CODE

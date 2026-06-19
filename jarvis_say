@@ -9,7 +9,7 @@ PIPER_DIR="$HOME/.local/piper"
 MODEL="$PIPER_DIR/en_GB-alan-medium.onnx"
 AUDIO_RATE="22050"
 
-USAGE="Usage: jarvis_say [--critical] \"Message text\""
+USAGE="Usage: ~/.local/bin/jarvis_say [--critical] \"Message text\""
 
 if [ $# -eq 0 ]; then
     echo "$USAGE"

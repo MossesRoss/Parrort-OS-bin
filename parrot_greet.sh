@@ -62,4 +62,4 @@ else
 fi
 
 # 7. Execute via Central Arbitrator
-jarvis_say "$TEXT" &
+~/.local/bin/~/.local/bin/jarvis_say "$TEXT" &

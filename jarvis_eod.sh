@@ -8,13 +8,13 @@ export DISPLAY=:0
 export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
 
-jarvis_say "Evening, sir. Initiating end of day cognitive rollup. Compiling telemetry from today's operations."
+~/.local/bin/~/.local/bin/jarvis_say "Evening, sir. Initiating end of day cognitive rollup. Compiling telemetry from today's operations."
 
 # 1. Extract clipboard data
 CLIPBOARD_DATA=$(copyq eval 'for(i=0; i<20; ++i) print(read(i) + "\n---\n")' 2>/dev/null)
 
 if [ -z "$CLIPBOARD_DATA" ]; then
-    jarvis_say "No clipboard telemetry found for today. Disengaging."
+    ~/.local/bin/~/.local/bin/jarvis_say "No clipboard telemetry found for today. Disengaging."
     exit 0
 fi
 
@@ -28,8 +28,8 @@ SUMMARY=$(ollama run qwen2.5-coder:3b "$SYSTEM_PROMPT
 $CLIPBOARD_DATA")
 
 if [ -n "$SUMMARY" ]; then
-    jarvis_say "$SUMMARY"
-    jarvis_say "Daily architecture logged. Disengage and rest."
+    ~/.local/bin/~/.local/bin/jarvis_say "$SUMMARY"
+    ~/.local/bin/~/.local/bin/jarvis_say "Daily architecture logged. Disengage and rest."
 else
-    jarvis_say "Neural synthesis failed. The daily archive could not be compiled."
+    ~/.local/bin/~/.local/bin/jarvis_say "Neural synthesis failed. The daily archive could not be compiled."
 fi

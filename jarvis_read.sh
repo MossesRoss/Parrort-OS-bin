@@ -23,4 +23,4 @@ fi
 notify-send -u low "JARVIS Reading" "Audio synthesis initiated."
 
 # Execute via central arbitrator (Normal priority so it queues if something else is talking)
-jarvis_say "$TEXT" &
+~/.local/bin/jarvis_say "$TEXT" &

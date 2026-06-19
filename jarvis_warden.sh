@@ -16,16 +16,16 @@ while true; do
         VIOLATION_SECONDS=$((VIOLATION_SECONDS + CHECK_INTERVAL))
 
         if [ "$VIOLATION_SECONDS" -eq 300 ]; then
-            jarvis_say "Warning Mr Mosas. You have been on a distraction node for five minutes. Please realign with foreground objectives."
+            ~/.local/bin/~/.local/bin/jarvis_say "Warning Mr Mosas. You have been on a distraction node for five minutes. Please realign with foreground objectives."
         fi
 
         if [ "$VIOLATION_SECONDS" -eq 600 ]; then
             # Escalated warning cuts through normal audio
-            jarvis_say --critical "Critical warning. Objective alignment is degrading. Close the browser immediately or execution protocols will engage."
+            ~/.local/bin/~/.local/bin/jarvis_say --critical "Critical warning. Objective alignment is degrading. Close the browser immediately or execution protocols will engage."
         fi
 
         if [ "$VIOLATION_SECONDS" -ge 720 ]; then
-            jarvis_say --critical "Time limit exceeded. Assassinating process."
+            ~/.local/bin/~/.local/bin/jarvis_say --critical "Time limit exceeded. Assassinating process."
             
             WINDOW_ID=$(xdotool getactivewindow)
             xdotool windowkill "$WINDOW_ID"

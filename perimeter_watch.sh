@@ -25,7 +25,7 @@ tail -n0 -F "$LOG_FILE" 2>/dev/null | grep --line-buffered -i -E "failed passwor
         notify-send -u critical "SECURITY ALERT" "Unauthorized access attempt detected at perimeter."
         
         # Priority override: Security alerts cut through all other audio
-        jarvis_say --critical "Security alert Mr Mosas. Anomalous access attempt detected at the perimeter. Recommend immediate triage."
+        ~/.local/bin/~/.local/bin/jarvis_say --critical "Security alert Mr Mosas. Anomalous access attempt detected at the perimeter. Recommend immediate triage."
         
         LAST_ALERT=$CURRENT_TIME
     fi

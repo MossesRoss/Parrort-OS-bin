@@ -32,7 +32,7 @@ fi
 notify-send -u critical "DEEP WORK ENGAGED" "Comms severed. Isolation timer set for $MINUTES minutes."
 
 # Starts the queue
-jarvis_say "Focus protocol engaged Mr Mosas. External comms are severed and distraction nodes are neutralized. $MANDATE You have $MINUTES minutes of absolute isolation. Lets build."
+~/.local/bin/~/.local/bin/jarvis_say "Focus protocol engaged Mr Mosas. External comms are severed and distraction nodes are neutralized. $MANDATE You have $MINUTES minutes of absolute isolation. Lets build."
 
 echo "[*] Deep work protocol active for $MINUTES minutes."
 while [ $TIME_LEFT -gt 0 ]; do
@@ -44,5 +44,5 @@ done
 echo -e "\n[*] Protocol complete. Unlocking perimeter."
 notify-send -u normal "DEEP WORK COMPLETE" "Focus block achieved."
 
-jarvis_say "Time is up Mr Mosas. The focus block is complete. Local perimeter is unlocked and network traffic is permitted. Excellent execution today."
+~/.local/bin/~/.local/bin/jarvis_say "Time is up Mr Mosas. The focus block is complete. Local perimeter is unlocked and network traffic is permitted. Excellent execution today."
 exit 0
