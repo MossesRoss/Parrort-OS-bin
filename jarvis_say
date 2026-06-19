@@ -22,7 +22,8 @@ if [ "$1" == "--critical" ]; then
     shift
 fi
 
-TEXT="$1"
+# Clean the text of markdown/code that breaks Piper
+TEXT=$(echo "$1" | sed -e 's/"//g' -e "s/'//g" -e 's/`//g' -e 's/\*//g' | tr '\n' ' ')
 if [ -z "$TEXT" ]; then
     exit 0
 fi
@@ -35,22 +36,23 @@ execute_speech() {
 }
 
 # ------------------------------------------------------------------------------
-# CRITICAL PATHWAY (Preemption + Mute Bypass)
+# CRITICAL PATHWAY (Preemption + Pipewire Mute Bypass)
 # ------------------------------------------------------------------------------
 if [ "$PRIORITY" == "CRITICAL" ]; then
     # 1. Clear the deck: Kill any current voice instances immediately
     pkill -f piper 2>/dev/null
     pkill -f aplay 2>/dev/null
     
-    # 2. Capture hardware mixer states
-    # Works natively with ALSA / PulseAudio / PipeWire compatibility layers
-    MUTED=$(amixer get Master | grep -o "\[off\]" | head -n 1)
-    VOL_LEVEL=$(amixer get Master | grep -oE "[0-9]+%" | head -n 1 | tr -d '%')
+    # 2. Capture hardware mixer states using wpctl (Parrot OS 6+ native)
+    # Get volume percentage (e.g., 0.45)
+    VOL_LEVEL=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | awk '{print $2}')
+    # Check if muted (wpctl appends [MUTED] if true)
+    MUTED=$(wpctl get-volume @DEFAULT_AUDIO_SINK@ | grep -o "\[MUTED\]")
 
     # 3. Force Unmute & set minimum audible threshold if system is silenced
-    if [ "$MUTED" == "[off]" ] || [ "$VOL_LEVEL" -lt 15 ]; then
-        amixer set Master unmute >/dev/null 2>&1
-        amixer set Master 40% >/dev/null 2>&1
+    if [ -n "$MUTED" ] || (( $(echo "$VOL_LEVEL < 0.15" | bc -l) )); then
+        wpctl set-mute @DEFAULT_AUDIO_SINK@ 0 >/dev/null 2>&1
+        wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.40 >/dev/null 2>&1
         RESTORE_AUDIO=true
     else
         RESTORE_AUDIO=false
@@ -61,9 +63,9 @@ if [ "$PRIORITY" == "CRITICAL" ]; then
 
     # 5. Restore original state exactly
     if [ "$RESTORE_AUDIO" = true ]; then
-        amixer set Master "$VOL_LEVEL%" >/dev/null 2>&1
-        if [ "$MUTED" == "[off]" ]; then
-            amixer set Master mute >/dev/null 2>&1
+        wpctl set-volume @DEFAULT_AUDIO_SINK@ "$VOL_LEVEL" >/dev/null 2>&1
+        if [ -n "$MUTED" ]; then
+            wpctl set-mute @DEFAULT_AUDIO_SINK@ 1 >/dev/null 2>&1
         fi
     fi
 
@@ -71,7 +73,7 @@ if [ "$PRIORITY" == "CRITICAL" ]; then
 # NORMAL PATHWAY (Sequential Queue via File Locking)
 # ------------------------------------------------------------------------------
 else
-    # Aquire exclusive lock. If another script is speaking, wait natively in line.
+    # Acquire exclusive lock. If another script is speaking, wait natively in line.
     exec 9>"$LOCK_FILE"
     flock 9
     

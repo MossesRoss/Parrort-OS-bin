@@ -4,9 +4,6 @@
 # PARROT OS: DYNAMIC BOOT GREETING (CINEMATIC)
 # ==========================================
 
-PIPER_DIR="$HOME/.local/piper"
-MODEL="$PIPER_DIR/en_GB-alan-medium.onnx"
-
 # 1. Determine Time of Day Context & Trigger Night Mode
 HOUR=$(date +"%H")
 NIGHT_MODE=0
@@ -64,5 +61,5 @@ else
     TEXT="$BOOT_SEQ $BAT_STRING $NET_STATUS $LOAD_STRING $SECURITY_STRING The environment is perfectly calibrated. Let's execute the agenda and create absolute leverage today with ruthless rationality. Awaiting your command sir."
 fi
 
-# 7. Neural Synthesis & Playback
-echo "$TEXT" | "$PIPER_DIR/piper" --model "$MODEL" --length_scale 0.85 --output_raw 2>/dev/null | aplay -r 22050 -f S16_LE -t raw -q
+# 7. Execute via Central Arbitrator
+jarvis_say "$TEXT" &
