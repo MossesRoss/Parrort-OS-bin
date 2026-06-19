@@ -11,3 +11,4 @@ playwright
 virtualenv
 agy
 .env*
+temp_jarvis.sh
