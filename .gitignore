@@ -10,4 +10,4 @@ otioview
 playwright
 virtualenv
 agy
-.env.*
+.env*
