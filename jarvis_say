@@ -1,0 +1,81 @@
+#!/bin/bash
+
+# ==============================================================================
+# JARVIS: CENTRAL AUDIO ARBITRATOR & PREEMPTION ENGINE
+# ==============================================================================
+
+LOCK_FILE="/tmp/jarvis_audio.lock"
+PIPER_DIR="$HOME/.local/piper"
+MODEL="$PIPER_DIR/en_GB-alan-medium.onnx"
+AUDIO_RATE="22050"
+
+USAGE="Usage: jarvis_say [--critical] \"Message text\""
+
+if [ $# -eq 0 ]; then
+    echo "$USAGE"
+    exit 1
+fi
+
+PRIORITY="NORMAL"
+if [ "$1" == "--critical" ]; then
+    PRIORITY="CRITICAL"
+    shift
+fi
+
+TEXT="$1"
+if [ -z "$TEXT" ]; then
+    exit 0
+fi
+
+# ------------------------------------------------------------------------------
+# FUNCTION: EXECUTE SPEECH PIPELINE
+# ------------------------------------------------------------------------------
+execute_speech() {
+    echo "$TEXT" | "$PIPER_DIR/piper" --model "$MODEL" --length_scale 0.85 --output_raw 2>/dev/null | aplay -r "$AUDIO_RATE" -f S16_LE -t raw -q
+}
+
+# ------------------------------------------------------------------------------
+# CRITICAL PATHWAY (Preemption + Mute Bypass)
+# ------------------------------------------------------------------------------
+if [ "$PRIORITY" == "CRITICAL" ]; then
+    # 1. Clear the deck: Kill any current voice instances immediately
+    pkill -f piper 2>/dev/null
+    pkill -f aplay 2>/dev/null
+    
+    # 2. Capture hardware mixer states
+    # Works natively with ALSA / PulseAudio / PipeWire compatibility layers
+    MUTED=$(amixer get Master | grep -o "\[off\]" | head -n 1)
+    VOL_LEVEL=$(amixer get Master | grep -oE "[0-9]+%" | head -n 1 | tr -d '%')
+
+    # 3. Force Unmute & set minimum audible threshold if system is silenced
+    if [ "$MUTED" == "[off]" ] || [ "$VOL_LEVEL" -lt 15 ]; then
+        amixer set Master unmute >/dev/null 2>&1
+        amixer set Master 40% >/dev/null 2>&1
+        RESTORE_AUDIO=true
+    else
+        RESTORE_AUDIO=false
+    fi
+
+    # 4. Speak immediately, overriding locks
+    execute_speech
+
+    # 5. Restore original state exactly
+    if [ "$RESTORE_AUDIO" = true ]; then
+        amixer set Master "$VOL_LEVEL%" >/dev/null 2>&1
+        if [ "$MUTED" == "[off]" ]; then
+            amixer set Master mute >/dev/null 2>&1
+        fi
+    fi
+
+# ------------------------------------------------------------------------------
+# NORMAL PATHWAY (Sequential Queue via File Locking)
+# ------------------------------------------------------------------------------
+else
+    # Aquire exclusive lock. If another script is speaking, wait natively in line.
+    exec 9>"$LOCK_FILE"
+    flock 9
+    
+    execute_speech
+    
+    # Release lock implicitly on exit
+fi
