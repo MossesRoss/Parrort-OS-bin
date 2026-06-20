@@ -16,4 +16,4 @@ else
     CLOSING="Entering standby mode."
 fi
 
-~/.local/bin/~/.local/bin/jarvis_say "System telemetry stored. Disengaging primary nodes and entering thermal preservation. $CLOSING"
+~/.local/bin/jarvis_say "System telemetry stored. Disengaging primary nodes and entering thermal preservation. $CLOSING"

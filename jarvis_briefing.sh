@@ -90,4 +90,4 @@ EOF
 )
 
 # 3. TTS EXECUTION via Arbitrator
-~/.local/bin/~/.local/bin/jarvis_say "$BRIEFING_TEXT" &
+~/.local/bin/jarvis_say "$BRIEFING_TEXT" &

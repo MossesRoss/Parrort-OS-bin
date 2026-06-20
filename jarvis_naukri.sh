@@ -9,7 +9,7 @@ export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 export DBUS_SESSION_BUS_ADDRESS="unix:path=${XDG_RUNTIME_DIR}/bus"
 
 # 1. JARVIS Audio Briefing (Queued)
-~/.local/bin/~/.local/bin/jarvis_say "Updating your telemetry in Naukri, sir. Please do not close the new browser window. Move it to a background workspace while I execute the payload."
+~/.local/bin/jarvis_say "Updating your telemetry in Naukri, sir. Please do not close the new browser window. Move it to a background workspace while I execute the payload."
 
 # 2. Launch Chrome in Debug Mode
 if ! ss -tuln | grep -q ":9222"; then
@@ -45,4 +45,4 @@ execute_payload()
 EOF
 
 # 4. Completion Audio
-~/.local/bin/~/.local/bin/jarvis_say "Upload complete, Mr Mosas. The recruiter algorithm has been refreshed."
+~/.local/bin/jarvis_say "Upload complete, Mr Mosas. The recruiter algorithm has been refreshed."
