@@ -36,7 +36,7 @@ import json
 import xml.etree.ElementTree as ET
 import os
 
-GEMINI_API_KEY = "YOUR_API_KEY_HERE"
+GEMINI_API_KEY = $GEMINI_API_KEY
 
 def get_weather():
     try:
@@ -81,7 +81,7 @@ def synthesize_briefing(weather, news):
             res_data = json.loads(response.read().decode())
             return res_data['candidates'][0]['content']['parts'][0]['text'].strip()
     except Exception as e:
-        return "Good morning Mr. Mosas. Telemetry generation failed, but systems are online."
+        return "Good morning Mr Mosas. Telemetry generation failed, but systems are online."
 
 weather_data = get_weather()
 news_data = get_news()

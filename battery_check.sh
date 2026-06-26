@@ -13,16 +13,18 @@ if ! command -v acpi &> /dev/null; then
     exit 1
 fi
 
-# 2. State Tracking (Prevents repeating)
+# 2. State Tracking (Prevents repeating & Centralizes Logic)
 WARNED_30=false
-WARNED_10=false
+WARNED_12=false
+WARNED_FULL=false
+LAST_STATUS="Unknown"
 
 # 3. Startup Confirmation
 notify-send "Battery Monitor Active" "Heuristics online."
 
 while true; do
     BAT_PER=$(acpi -b | grep -oP '\d+(?=%)' | sort -n | head -1)
-    IS_DISCHARGING=$(acpi -b | grep "Discharging")
+    CURRENT_STATUS=$(acpi -b | grep -oP '(Discharging|Charging|Full|Not charging)' | head -1)
 
     # Safety: If ACPI failed to return a number
     if [[ -z "$BAT_PER" ]]; then
@@ -30,13 +32,32 @@ while true; do
         continue
     fi
 
-    # Grid Connected Check
-    if [[ -z "$IS_DISCHARGING" ]]; then
+    # --- GRID CONNECTION ALERTS (CENTRALIZED STATE TRACKING) ---
+    if [ "$LAST_STATUS" != "Unknown" ] && [ "$LAST_STATUS" != "$CURRENT_STATUS" ]; then
+        if [ "$CURRENT_STATUS" == "Discharging" ]; then
+            ~/.local/bin/jarvis_say "Power source disconnected. Operating on internal reserves."
+        elif [ "$CURRENT_STATUS" == "Charging" ]; then
+            ~/.local/bin/jarvis_say "Main grid connected. Charging sequence initiated."
+        fi
+    fi
+    LAST_STATUS="$CURRENT_STATUS"
+
+    # --- CHARGING / FULL LOGIC ---
+    if [ "$CURRENT_STATUS" != "Discharging" ]; then
+        # Reset low battery warnings because we are plugged in
         WARNED_30=false
-        WARNED_10=false
-        sleep 60
+        WARNED_12=false
+
+        # Alert when optimal capacity is reached
+        if [ "$BAT_PER" -ge 95 ] && [ "$WARNED_FULL" = false ]; then
+            ~/.local/bin/jarvis_say "Battery is at optimal capacity. You may disconnect the power source, sir."
+            WARNED_FULL=true
+        fi
+        sleep 30
         continue
     fi
+
+    WARNED_FULL=false # Reset full warning since we are draining
 
     # --- EMERGENCY SUSPEND (8%) ---
     if [ "$BAT_PER" -le 8 ]; then
@@ -47,10 +68,10 @@ while true; do
         sleep 60 
 
     # --- CRITICAL PRESSURE (12%) ---
-    elif [ "$BAT_PER" -le 12 ] && [ "$WARNED_10" = false ]; then
+    elif [ "$BAT_PER" -le 12 ] && [ "$WARNED_12" = false ]; then
         notify-send -u critical "⚠️ CRITICAL PRESSURE: $BAT_PER%" "Connect charger immediately."
         ~/.local/bin/jarvis_say --critical "Sir, I must strongly advise connecting to the main grid immediately. Core energy cells are critical at $BAT_PER percent. System shutdown is imminent."
-        WARNED_10=true
+        WARNED_12=true
         sleep 30
 
     # --- LOW WARNING (30%) ---
