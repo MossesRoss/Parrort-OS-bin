@@ -50,7 +50,7 @@ while true; do
 
         # Alert when optimal capacity is reached
         if [ "$BAT_PER" -ge 95 ] && [ "$WARNED_FULL" = false ]; then
-            ~/.local/bin/jarvis_say "Battery is at optimal capacity. You may disconnect the power source, sir."
+            ~/.local/bin/jarvis_say "Battery full sir."
             WARNED_FULL=true
         fi
         sleep 30
