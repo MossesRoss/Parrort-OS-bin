@@ -9,7 +9,7 @@ PIPER_DIR="$HOME/.local/piper"
 MODEL="$PIPER_DIR/en_GB-alan-medium.onnx"
 AUDIO_RATE="22050"
 
-USAGE="Usage: ~/.local/bin/jarvis_say [--critical] \"Message text\""
+USAGE="Usage: jarvis_say [--critical] \"Message text\""
 
 if [ $# -eq 0 ]; then
     echo "$USAGE"
@@ -58,10 +58,36 @@ if [ "$PRIORITY" == "CRITICAL" ]; then
         RESTORE_AUDIO=false
     fi
 
-    # 4. Speak immediately, overriding locks
+    # 4. Ducking Protocol: Isolate background apps (VLC, Chrome) and reduce to 10%
+    declare -A DUCKED_STREAMS
+    CURRENT_SINK_ID=""
+    
+    while IFS= read -r line; do
+        if [[ "$line" == Sink\ Input\ #* ]]; then
+            CURRENT_SINK_ID="${line#Sink Input #}"
+        elif [[ "$line" == *Volume:* ]] && [ -n "$CURRENT_SINK_ID" ]; then
+            # Extract the first volume percentage (e.g., 70%)
+            VOL_PCT=$(echo "$line" | grep -oP '\d+%' | head -n 1)
+            if [ -n "$VOL_PCT" ]; then
+                # Save the original volume to memory
+                DUCKED_STREAMS["$CURRENT_SINK_ID"]="$VOL_PCT"
+                # Instantly crush the background app to 10%
+                pactl set-sink-input-volume "$CURRENT_SINK_ID" 10% >/dev/null 2>&1
+            fi
+            CURRENT_SINK_ID=""
+        fi
+    done <<< "$(pactl list sink-inputs 2>/dev/null)"
+
+    # 5. Speak immediately, overriding locks
     execute_speech
 
-    # 5. Restore original state exactly
+    # 6. Restore ducked background streams to their exact original volumes
+    for SINK_ID in "${!DUCKED_STREAMS[@]}"; do
+        ORIG_VOL="${DUCKED_STREAMS[$SINK_ID]}"
+        pactl set-sink-input-volume "$SINK_ID" "$ORIG_VOL" >/dev/null 2>&1
+    done
+
+    # 7. Restore master volume state exactly
     if [ "$RESTORE_AUDIO" = true ]; then
         wpctl set-volume @DEFAULT_AUDIO_SINK@ "$VOL_LEVEL" >/dev/null 2>&1
         if [ -n "$MUTED" ]; then
