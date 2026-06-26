@@ -20,7 +20,7 @@ WARNED_FULL=false
 LAST_STATUS="Unknown"
 
 # 3. Startup Confirmation
-notify-send "Battery Monitor Active" "Heuristics online."
+notify-send "Battery Monitor Active" "Jarvis: Heuristics online."
 
 while true; do
     BAT_PER=$(acpi -b | grep -oP '\d+(?=%)' | sort -n | head -1)

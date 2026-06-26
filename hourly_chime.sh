@@ -18,11 +18,11 @@ SPOKEN_TIME="$HOUR_12 $AMPM"
 # 3. Dialogue Pools
 # Executive, Rational, and Symbiote base phrases
 GENERAL=(
-    "Sir, the hour has turned to $SPOKEN_TIME. Autonomous systems are nominal. What is your next directive?"
+    "Sir, the hour has turned to $SPOKEN_TIME. Autonomous systems are nominal. What's next sir?"
     "Clocking $SPOKEN_TIME. High-velocity execution window remains open. Proceeding with background orchestration."
-    "Time check: $SPOKEN_TIME. All primary nodes are operational. The board is yours, sir."
+    "Time check Mr Mosas: $SPOKEN_TIME. All primary nodes are operational. The board is yours sir."
     "Temporal marker: $SPOKEN_TIME. Assess your hourly yield, sir."
-    "$SPOKEN_TIME. The day is finite. Proceed with optimal efficiency."
+    "$SPOKEN_TIME, The day is finite. Proceed with optimal efficiency Mr Mosas."
     "Hour cycle complete at $SPOKEN_TIME. Recalibrating focus parameters."
     "System clock synchronized at $SPOKEN_TIME. Neural pathways hold steady. You have the grid."
     "Cycle complete. It is $SPOKEN_TIME. Awaiting next command sequence."

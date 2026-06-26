@@ -9,6 +9,6 @@ otiotool
 otioview
 playwright
 virtualenv
-agy
+agy*
 .env*
 temp_jarvis.sh
