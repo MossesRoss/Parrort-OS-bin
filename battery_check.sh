@@ -35,9 +35,9 @@ while true; do
     # --- GRID CONNECTION ALERTS (CENTRALIZED STATE TRACKING) ---
     if [ "$LAST_STATUS" != "Unknown" ] && [ "$LAST_STATUS" != "$CURRENT_STATUS" ]; then
         if [ "$CURRENT_STATUS" == "Discharging" ]; then
-            ~/.local/bin/jarvis_say "Power source disconnected. Operating on internal reserves."
+            ~/.local/bin/jarvis_say "Power source disconnected, Operating on internal reserves. Our Battery is compromised - find powersource."
         elif [ "$CURRENT_STATUS" == "Charging" ]; then
-            ~/.local/bin/jarvis_say "Main grid connected. Charging sequence initiated."
+            ~/.local/bin/jarvis_say "Charging"
         fi
     fi
     LAST_STATUS="$CURRENT_STATUS"
@@ -70,14 +70,14 @@ while true; do
     # --- CRITICAL PRESSURE (12%) ---
     elif [ "$BAT_PER" -le 12 ] && [ "$WARNED_12" = false ]; then
         notify-send -u critical "⚠️ CRITICAL PRESSURE: $BAT_PER%" "Connect charger immediately."
-        ~/.local/bin/jarvis_say --critical "Sir, I must strongly advise connecting to the main grid immediately. Core energy cells are critical at $BAT_PER percent. System shutdown is imminent."
+        ~/.local/bin/jarvis_say --critical "Sir I must strongly advise connecting to the main grid immediately. Core energy cells are critical at $BAT_PER percent. System shutdown is imminent."
         WARNED_12=true
         sleep 30
 
     # --- LOW WARNING (30%) ---
     elif [ "$BAT_PER" -le 30 ] && [ "$WARNED_30" = false ]; then
         notify-send -u normal "🔋 Battery at $BAT_PER%" "Find power source."
-        ~/.local/bin/jarvis_say --critical "Pardon the interruption, Mr Mosas. Internal power reserves have dropped to $BAT_PER percent."
+        ~/.local/bin/jarvis_say --critical "Pardon the interruption, Mr Mosas Internal power reserves have dropped to $BAT_PER percent."
         WARNED_30=true
         sleep 60
 
