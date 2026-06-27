@@ -18,8 +18,6 @@ WARNED_50=false
 WARNED_30=false
 WARNED_12=false
 
-# 3. Startup Confirmation
-notify-send "Battery Monitor Active" "Monitoring battery — alerts at 70, 50, 30, 12, suspend at 9."
 
 while true; do
     BAT_PER=$(acpi -b | grep -oP '\d+(?=%)' | sort -n | head -1)
