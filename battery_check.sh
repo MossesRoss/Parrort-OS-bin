@@ -1,11 +1,10 @@
 #!/bin/bash
 
 # ==========================================
-# PARROT OS: CEO BATTERY MONITOR
+# BATTERY MONITOR — Silent Prompt Alerts
 # ==========================================
 
 export XDG_RUNTIME_DIR=/run/user/$(id -u)
-export PULSE_SERVER="unix:${XDG_RUNTIME_DIR}/pulse/native"
 
 # 1. Dependency Check
 if ! command -v acpi &> /dev/null; then
@@ -13,14 +12,14 @@ if ! command -v acpi &> /dev/null; then
     exit 1
 fi
 
-# 2. State Tracking (Prevents repeating & Centralizes Logic)
+# 2. State Tracking (one-shot flags per threshold)
+WARNED_70=false
+WARNED_50=false
 WARNED_30=false
 WARNED_12=false
-WARNED_FULL=false
-LAST_STATUS="Unknown"
 
 # 3. Startup Confirmation
-notify-send "Battery Monitor Active" "Jarvis: Heuristics online."
+notify-send "Battery Monitor Active" "Monitoring battery — alerts at 70, 50, 30, 12, suspend at 9."
 
 while true; do
     BAT_PER=$(acpi -b | grep -oP '\d+(?=%)' | sort -n | head -1)
@@ -32,57 +31,53 @@ while true; do
         continue
     fi
 
-    # --- GRID CONNECTION ALERTS (CENTRALIZED STATE TRACKING) ---
-    if [ "$LAST_STATUS" != "Unknown" ] && [ "$LAST_STATUS" != "$CURRENT_STATUS" ]; then
-        if [ "$CURRENT_STATUS" == "Discharging" ]; then
-            ~/.local/bin/jarvis_say "Power source disconnected, Operating on internal reserves. Our Battery is compromised - find powersource."
-        elif [ "$CURRENT_STATUS" == "Charging" ]; then
-            ~/.local/bin/jarvis_say "Charging"
-        fi
-    fi
-    LAST_STATUS="$CURRENT_STATUS"
-
-    # --- CHARGING / FULL LOGIC ---
+    # --- CHARGING / NOT DISCHARGING — reset warnings & do nothing ---
     if [ "$CURRENT_STATUS" != "Discharging" ]; then
-        # Reset low battery warnings because we are plugged in
+        WARNED_70=false
+        WARNED_50=false
         WARNED_30=false
         WARNED_12=false
-
-        # Alert when optimal capacity is reached
-        if [ "$BAT_PER" -ge 95 ] && [ "$WARNED_FULL" = false ]; then
-            ~/.local/bin/jarvis_say "Battery full sir."
-            WARNED_FULL=true
-        fi
         sleep 30
         continue
     fi
 
-    WARNED_FULL=false # Reset full warning since we are draining
-
-    # --- EMERGENCY SUSPEND (8%) ---
-    if [ "$BAT_PER" -le 8 ]; then
-        notify-send -u critical "CRITICAL BATTERY ($BAT_PER%)" "EMERGENCY SUSPEND."
+    # --- EMERGENCY SUSPEND (9%) ---
+    if [ "$BAT_PER" -le 9 ]; then
+        notify-send -u critical "⛔ EMERGENCY SUSPEND ($BAT_PER%)" "Battery critically low. Suspending now."
         ~/.local/bin/jarvis_say --critical "Critical energy failure. Power reserves at $BAT_PER percent. Initiating emergency suspend protocol to preserve core systems. Goodbye sir."
-        sleep 2 
+        sleep 2
         systemctl suspend
-        sleep 60 
+        sleep 60
 
-    # --- CRITICAL PRESSURE (12%) ---
+    # --- CRITICAL (12%) ---
     elif [ "$BAT_PER" -le 12 ] && [ "$WARNED_12" = false ]; then
-        notify-send -u critical "⚠️ CRITICAL PRESSURE: $BAT_PER%" "Connect charger immediately."
+        notify-send -u critical "🔴 CRITICAL: $BAT_PER%" "Connect charger immediately!"
         ~/.local/bin/jarvis_say --critical "Sir I must strongly advise connecting to the main grid immediately. Core energy cells are critical at $BAT_PER percent. System shutdown is imminent."
         WARNED_12=true
         sleep 30
 
-    # --- LOW WARNING (30%) ---
+    # --- CRITICAL (30%) ---
     elif [ "$BAT_PER" -le 30 ] && [ "$WARNED_30" = false ]; then
-        notify-send -u normal "🔋 Battery at $BAT_PER%" "Find power source."
-        ~/.local/bin/jarvis_say --critical "Pardon the interruption, Mr Mosas Internal power reserves have dropped to $BAT_PER percent."
+        notify-send -u critical "🟠 Battery Low: $BAT_PER%" "Battery is getting critical. Find a power source."
+        ~/.local/bin/jarvis_say --critical "Pardon the interruption sir. Internal power reserves have dropped to $BAT_PER percent."
         WARNED_30=true
+        sleep 30
+
+    # --- WARNING (50%) ---
+    elif [ "$BAT_PER" -le 50 ] && [ "$WARNED_50" = false ]; then
+        notify-send -u normal "🟡 Battery at $BAT_PER%" "Consider plugging in soon."
+        ~/.local/bin/jarvis_say "Battery at $BAT_PER percent sir. Consider plugging in."
+        WARNED_50=true
+        sleep 30
+
+    # --- INFO (70%) ---
+    elif [ "$BAT_PER" -le 70 ] && [ "$WARNED_70" = false ]; then
+        notify-send -u low "🔋 Battery at $BAT_PER%" "Running on battery."
+        ~/.local/bin/jarvis_say "Battery at $BAT_PER percent. Running on internal reserves."
+        WARNED_70=true
         sleep 60
 
     else
-        # Standard polling interval
         sleep 30
     fi
 done
