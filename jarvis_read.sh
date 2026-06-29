@@ -20,7 +20,6 @@ if [ -z "$TEXT" ]; then
     exit 1
 fi
 
-notify-send -u low "JARVIS Reading" "Audio synthesis initiated."
+notify-send -u low "JARVIS" "Audio synthesis initiated."
 
-# Execute via central arbitrator (Normal priority so it queues if something else is talking)
 ~/.local/bin/jarvis_say "$TEXT" &

@@ -10,7 +10,7 @@ NIGHT_MODE=0
 
 if [ "$HOUR" -ge 22 ] || [ "$HOUR" -lt 5 ]; then
     NIGHT_MODE=1
-    GREETING="WARNING, Mr Mosas. It is past 10-o clock. Biological preservation protocols advise disengagement, but I'm acknowledging your manual override."
+    GREETING="WARNING, Mr Mosas. It is past 10-o clock. Biological preservation protocols advise disengagement, but I am acknowledging your manual override."
     BOOT_SEQ="$GREETING Mainframe is shifting to low-power nocturnal mode."
 elif [ "$HOUR" -lt 12 ]; then 
     GREETING="Good-morning, Mr Mosas."
