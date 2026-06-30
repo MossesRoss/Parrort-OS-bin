@@ -6,7 +6,7 @@
 
 MINUTES=${1:-90}
 
-DISTRACTIONS=("discord" "telegram-desktop" "slack" "skype" "whatsapp")
+DISTRACTIONS=("discord" "telegram-desktop" "slack" "skype" "whatsapp" "youtube")
 
 echo "[*] Neutralizing distraction vectors..."
 for app in "${DISTRACTIONS[@]}"; do
@@ -18,7 +18,7 @@ MANDATE="Operating in air-gapped stealth. Maximum compute is now routed to your 
 notify-send -u critical "DEEP WORK ENGAGED" "Comms severed. Isolation timer set for $MINUTES minutes."
 
 # Voice synthesized output
-~/.local/bin/jarvis_say "Focus protocol engaged Mr Mosses. External comms are severed and distraction nodes are neutralized. $MANDATE You have $MINUTES minutes of absolute isolation. Lets build."
+~/.local/bin/jarvis_say "Focus protocol engaged Mr Moses. External comms are severed and distraction nodes are neutralized. $MANDATE You have $MINUTES minutes of absolute isolation. Lets build."
 
 echo "[*] Deep work protocol active for $MINUTES minutes. Launching HUD..."
 
