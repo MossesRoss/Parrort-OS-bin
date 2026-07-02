@@ -112,8 +112,8 @@ canvas.bind("<ButtonRelease-1>", stop_move)
 canvas.bind("<B1-Motion>", do_move)
 
 jarvis_path = os.path.expanduser("~/.local/bin/jarvis_say")
-milestone_30_triggered = False
-milestone_10_triggered = False
+milestone_30_triggered = total_seconds <= 1800
+milestone_10_triggered = total_seconds <= 600
 
 def update_ui():
     global milestone_30_triggered, milestone_10_triggered
@@ -145,7 +145,7 @@ def update_ui():
 
     # --- AUTONOMIC ENTRAINMENT (Breathing Ring) ---
     pulse = math.sin(current_time * (2 * math.pi / 11.0)) 
-    r_width = 85 + (pulse * 10)
+    r_width = 105 + (pulse * 10)
     r_height = 40 + (pulse * 5)
     canvas.coords(ring, base_x - r_width, base_y - r_height, base_x + r_width, base_y + r_height)
     canvas.itemconfig(ring, outline=color)
