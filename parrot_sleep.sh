@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ==========================================
-# PARROT OS: PRE-SUSPEND CINEMATIC (DYNAMIC)
+# PARROT OS: PRE-SUSPEND
 # ==========================================
 
 export DISPLAY=:0
