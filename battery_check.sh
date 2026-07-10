@@ -29,8 +29,8 @@ while true; do
         continue
     fi
 
-    # --- CHARGING / NOT DISCHARGING — reset warnings & do nothing ---
-    if [ "$CURRENT_STATUS" != "Discharging" ]; then
+    # --- CHARGING / NOT DISCHARGING / PLUGGED IN — reset warnings & do nothing ---
+    if [ "$CURRENT_STATUS" != "Discharging" ] || acpi -a | grep -iq "on-line"; then
         WARNED_70=false
         WARNED_50=false
         WARNED_30=false
